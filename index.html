@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirect Page</title>
+    <script>
+        (async () => {
+            // Try opening about:blank
+            const newWindow = window.open('about:blank', '_blank');
+
+            // If blocked → STOP completely
+            if (!newWindow || newWindow.closed) {
+                console.warn('Popup blocked. No redirect will happen.');
+                return;
+            }
+
+            try {
+                // Load frog.html
+                const response = await fetch('frog.html');
+                const html = await response.text();
+
+                // Inject into popup
+                newWindow.document.open();
+                newWindow.document.write(html);
+                newWindow.document.close();
+
+                // ONLY redirect if everything above worked
+                window.location.href = 'https://google.com/';
+            } catch (err) {
+                console.error('Failed to load frog.html:', err);
+                newWindow.document.body.innerHTML = '<h1>Error loading content</h1>';
+                // IMPORTANT: no redirect here
+            }
+        })();
+    </script>
+</head>
+</html>
